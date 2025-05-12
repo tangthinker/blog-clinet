@@ -1,6 +1,6 @@
 {
-    "name": "blog_client",
-    "short_name": "blog_client",
+    "name": "Tangthinekr Blog",
+    "short_name": "Tangthinekr Blog",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
