@@ -126,7 +126,7 @@ class _OpenDrawerScreenState extends State<OpenDrawerScreen> {
       child: Stack(
         children: [
            Container(
-             padding: const EdgeInsets.only(top: 50, left: 50, right: 50),
+             padding: const EdgeInsets.only(top: 100, left: 50, right: 50),
                child: Markdown(
                 data: content,
                 imageBuilder: (url, title, alt) {
@@ -151,7 +151,7 @@ class _OpenDrawerScreenState extends State<OpenDrawerScreen> {
                     children: [
                       SizedBox(height: 50,),
                       Container(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.only(top: 80, left: 16, right: 16, bottom: 16),
                         child: const Text(
                           "Contents",
                           style: TextStyle(color: CupertinoColors.black, fontWeight: FontWeight.bold),
