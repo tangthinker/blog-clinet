@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:blog_client/network/proto.dart';
@@ -35,6 +37,7 @@ class _OpenDrawerScreenState extends State<OpenDrawerScreen> {
   bool _drawerOpen = false;
   List<FileInfo> _fileInfo = [];
   final List<String> _path = [];
+  final double sidebarWidth = Platform.isAndroid || Platform.isIOS ? 0.6 : 0.3;
 
   @override
   void initState() {
@@ -56,20 +59,29 @@ class _OpenDrawerScreenState extends State<OpenDrawerScreen> {
     });
   }
 
+  bool _isRootPath() {
+    return _path.isEmpty;
+  }
+
   String _getPath() {
     return "/${_path.join("/")}/";
   }
 
   void _goBack() {
+    if(_path.isEmpty) {
+      return;
+    }
     setState(() {
       _path.removeLast();
     });
+    _loadFileInfo();
   }
 
   void _goForward(String path) {
     setState(() {
       _path.add(path);
     });
+    _loadFileInfo();
   }
 
 
@@ -91,8 +103,8 @@ class _OpenDrawerScreenState extends State<OpenDrawerScreen> {
             duration: const Duration(milliseconds: 150),
             top: 0,
             bottom: 0,
-            left: _drawerOpen ? 0 : -MediaQuery.of(context).size.width * 0.3,
-            width: MediaQuery.of(context).size.width * 0.3,
+            left: _drawerOpen ? 0 : -MediaQuery.of(context).size.width * sidebarWidth,
+            width: MediaQuery.of(context).size.width * sidebarWidth,
             child: GestureDetector(
               onTap: () {},
               child: Material(
@@ -110,12 +122,30 @@ class _OpenDrawerScreenState extends State<OpenDrawerScreen> {
                           style: TextStyle(color: CupertinoColors.black, fontWeight: FontWeight.bold),
                         ),
                       ),
-                      ..._fileInfo.map((file) => SidebarItem(title: file.filename, onPressed: () {
-                        if (file.dir) {
-                          _goForward(file.filename);
-                          _loadFileInfo();
-                          _toggleDrawer();
-                        } 
+                      if (!_isRootPath())
+                      Padding(
+                        padding: const EdgeInsets.only(top: 5, bottom: 15, left: 20, right: 20),
+                        child: Container(
+                          height: 20,
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                                color: CupertinoColors.activeBlue,
+                                width: 1,
+                            ),
+                            borderRadius: BorderRadius.circular(5)
+                          ),
+                          child: CupertinoButton(
+                            padding: EdgeInsets.zero,
+                            onPressed: _goBack,
+                            child: const Text("Back", style: TextStyle(fontSize: 12, color: CupertinoColors.activeBlue),),
+                          ),
+                        ),
+                      ),
+                      ..._fileInfo.map((file) => SidebarItem(title: file.filename, isDir:  file.dir,
+                          onPressed: () {
+                            if (file.dir) {
+                              _goForward(file.filename);
+                            }
                       })),
                     ],
                   ),
@@ -134,16 +164,30 @@ class SidebarItem extends StatelessWidget {
   final void Function() onPressed;
 
   final String title;
+  
+  final bool isDir;
 
-  const SidebarItem({super.key,  required this.title, required this.onPressed});
+  const SidebarItem({super.key,  required this.title, required this.isDir, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 22,
+
+    final Widget icon = Padding(
+      padding: const EdgeInsets.only(right: 5),
+      child: isDir ? Icon(CupertinoIcons.folder, size: 15,) : Icon(CupertinoIcons.doc, size: 15,),
+    );
+
+    return SizedBox(
+      height: 25,
       child: CupertinoListTile(
-        title: Text(title, style: const TextStyle(fontSize: 12),),
-        onTap: onPressed,
+          padding: EdgeInsets.only(left: 10),
+          title: Row(
+            children: [
+              icon,
+              Text(title, style: const TextStyle(fontSize: 12),),
+            ],
+          ),
+          onTap: onPressed,
       ),
     );
   }
