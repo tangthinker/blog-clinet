@@ -126,7 +126,7 @@ class _OpenDrawerScreenState extends State<OpenDrawerScreen> {
       child: Stack(
         children: [
            Container(
-             padding: const EdgeInsets.only(top: 50),
+             padding: const EdgeInsets.only(top: 50, left: 50, right: 50),
                child: Markdown(
                 data: content,
                 imageBuilder: (url, title, alt) {
