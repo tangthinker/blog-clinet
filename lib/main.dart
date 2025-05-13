@@ -1,9 +1,12 @@
 import 'dart:io';
-
+import 'package:blog_client/network/requests.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:blog_client/network/proto.dart';
 import 'package:blog_client/network/fetchData.dart';
+
 
 void main() {
   runApp(const MyApp());
@@ -37,12 +40,36 @@ class _OpenDrawerScreenState extends State<OpenDrawerScreen> {
   bool _drawerOpen = false;
   List<FileInfo> _fileInfo = [];
   final List<String> _path = [];
-  final double sidebarWidth = Platform.isAndroid || Platform.isIOS ? 0.6 : 0.3;
+  String content = "# Welcome to Tangthinker Blog";
+
+  double sidebarWidth() {
+    if(checkPlatform()) {
+      return 0.6;
+    }
+    return 0.3;
+  }
+
+  bool checkPlatform() {
+    if (kIsWeb) {
+      return false;
+    }
+    if (Platform.isAndroid || Platform.isIOS) {
+      return true;
+    }
+    return false;
+  }
 
   @override
   void initState() {
     super.initState();
     _loadFileInfo();
+  }
+
+  void _loadFileContent(String path) async {
+    final content = await FetchData.getFileContent(_getPath() + path);
+    setState(() {
+      this.content = content;
+    });
   }
 
   void _loadFileInfo() async {
@@ -98,13 +125,21 @@ class _OpenDrawerScreenState extends State<OpenDrawerScreen> {
       ),
       child: Stack(
         children: [
-          const Center(child: Text("Welcome to Tangthinker Blog")),
+           Container(
+             padding: const EdgeInsets.only(top: 50),
+               child: Markdown(
+                data: content,
+                imageBuilder: (url, title, alt) {
+                  return Image.network(baseUrl + url.toString());
+                },
+                )
+           ),
           AnimatedPositioned(
             duration: const Duration(milliseconds: 150),
             top: 0,
             bottom: 0,
-            left: _drawerOpen ? 0 : -MediaQuery.of(context).size.width * sidebarWidth,
-            width: MediaQuery.of(context).size.width * sidebarWidth,
+            left: _drawerOpen ? 0 : -MediaQuery.of(context).size.width * sidebarWidth(),
+            width: MediaQuery.of(context).size.width * sidebarWidth(),
             child: GestureDetector(
               onTap: () {},
               child: Material(
@@ -145,6 +180,8 @@ class _OpenDrawerScreenState extends State<OpenDrawerScreen> {
                           onPressed: () {
                             if (file.dir) {
                               _goForward(file.filename);
+                            } else {
+                              _loadFileContent(file.filename);
                             }
                       })),
                     ],

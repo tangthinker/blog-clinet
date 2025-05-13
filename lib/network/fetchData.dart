@@ -11,4 +11,14 @@ class FetchData {
       return [];
     }
   }
+
+  static Future<String> getFileContent(String path) async {
+    try {
+      final fileContent = await Request.getFileContent(path);
+      return fileContent;
+    } catch (e) {
+      print(e);
+      return '';
+    }
+  }
 }
