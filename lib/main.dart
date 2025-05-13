@@ -34,11 +34,20 @@ class OpenDrawerScreen extends StatefulWidget {
 class _OpenDrawerScreenState extends State<OpenDrawerScreen> {
   bool _drawerOpen = false;
   List<FileInfo> _fileInfo = [];
+  final List<String> _path = [];
 
   @override
   void initState() {
     super.initState();
-    _fileInfo = FetchData.getFileInfo();
+    _loadFileInfo();
+  }
+
+  void _loadFileInfo() async {
+    final currentPath = _getPath();
+    final files = await FetchData.getFileInfo(currentPath);
+    setState(() {
+      _fileInfo = files;
+    });
   }
 
   void _toggleDrawer() {
@@ -46,6 +55,23 @@ class _OpenDrawerScreenState extends State<OpenDrawerScreen> {
       _drawerOpen = !_drawerOpen;
     });
   }
+
+  String _getPath() {
+    return "/${_path.join("/")}/";
+  }
+
+  void _goBack() {
+    setState(() {
+      _path.removeLast();
+    });
+  }
+
+  void _goForward(String path) {
+    setState(() {
+      _path.add(path);
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +110,13 @@ class _OpenDrawerScreenState extends State<OpenDrawerScreen> {
                           style: TextStyle(color: CupertinoColors.black, fontWeight: FontWeight.bold),
                         ),
                       ),
-                      ..._fileInfo.map((file) => SidebarItem(title: file.filename, onPressed: () {})),
+                      ..._fileInfo.map((file) => SidebarItem(title: file.filename, onPressed: () {
+                        if (file.dir) {
+                          _goForward(file.filename);
+                          _loadFileInfo();
+                          _toggleDrawer();
+                        } 
+                      })),
                     ],
                   ),
                 ),
