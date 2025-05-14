@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:blog_client/componets/codeHeightLight.dart';
+import 'package:blog_client/componets/mathBuilder.dart';
 import 'package:blog_client/network/requests.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
@@ -123,7 +124,6 @@ class _OpenDrawerScreenState extends State<OpenDrawerScreen> {
     _loadFileInfo();
   }
 
-
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
@@ -142,7 +142,8 @@ class _OpenDrawerScreenState extends State<OpenDrawerScreen> {
                child: Markdown(
                 data: content,
                 builders: {
-                  "code": CodeElementBuilder()
+                  "code": CodeElementBuilder(),
+                  "math": MathBuilder(),
                 },
                 sizedImageBuilder: (config) {
                   return Center(
