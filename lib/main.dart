@@ -1,5 +1,7 @@
 import 'dart:io';
+import 'package:blog_client/componets/codeHeightLight.dart';
 import 'package:blog_client/network/requests.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter/cupertino.dart';
@@ -139,11 +141,17 @@ class _OpenDrawerScreenState extends State<OpenDrawerScreen> {
              padding: const EdgeInsets.only(top: 100, left: 10, right: 10),
                child: Markdown(
                 data: content,
+                builders: {
+                  "code": CodeElementBuilder()
+                },
                 sizedImageBuilder: (config) {
                   return Center(
                     child: SizedBox(
                         width: MediaQuery.of(context).size.width * 0.6,
-                        child: Image.network(baseUrl + config.uri.toString())
+                        child: CachedNetworkImage(
+                          imageUrl: baseUrl + config.uri.toString(),
+                          placeholder: (context, url) => CupertinoActivityIndicator(),
+                        )
                     ),
                   );
                 },
