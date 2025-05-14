@@ -49,6 +49,16 @@ class _OpenDrawerScreenState extends State<OpenDrawerScreen> {
     return 0.3;
   }
 
+  int sidebarContentTopPadding() {
+    if (checkPlatform()) {
+      if (Platform.isAndroid) {
+        return 50;
+      }
+      return 80;
+    }
+    return 10;
+  }
+
   bool checkPlatform() {
     if (kIsWeb) {
       return false;
@@ -126,11 +136,16 @@ class _OpenDrawerScreenState extends State<OpenDrawerScreen> {
       child: Stack(
         children: [
            Container(
-             padding: const EdgeInsets.only(top: 100, left: 50, right: 50),
+             padding: const EdgeInsets.only(top: 100, left: 10, right: 10),
                child: Markdown(
                 data: content,
-                imageBuilder: (url, title, alt) {
-                  return Image.network(baseUrl + url.toString());
+                sizedImageBuilder: (config) {
+                  return Center(
+                    child: SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.6,
+                        child: Image.network(baseUrl + config.uri.toString())
+                    ),
+                  );
                 },
                 )
            ),
@@ -151,7 +166,7 @@ class _OpenDrawerScreenState extends State<OpenDrawerScreen> {
                     children: [
                       SizedBox(height: 50,),
                       Container(
-                        padding: const EdgeInsets.only(top: 80, left: 16, right: 16, bottom: 16),
+                        padding: EdgeInsets.only(top: sidebarContentTopPadding().toDouble(), left: 16, right: 16, bottom: 16),
                         child: const Text(
                           "Contents",
                           style: TextStyle(color: CupertinoColors.black, fontWeight: FontWeight.bold),
